@@ -1,0 +1,4 @@
+Name	Demand	Amount	
+Item1	12	32
+Item2	87	100
+Item3	25	54

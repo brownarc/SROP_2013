@@ -2,3 +2,6 @@ Name	Demand	Amount
 Item1	12	32
 Item2	87	100
 Item3	25	54
+Item4	23	12
+Item5	67	90
+Item6	11	42

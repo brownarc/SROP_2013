@@ -1,11 +1,15 @@
 class Simulation (object):
     def __init__ (self, File_name):
         self.Bins = []
+        self.Bins_Consumed = []
         self.Board = []
         self.Data = []
         self.File_name = File_name
         self.Inventory = []
+        self.Track_Board = []
+        self.Track_Virtual = []
         self.Virtual_Board = []
+        self.Time = 0
 
         self.Extraction()
 
@@ -17,29 +21,36 @@ class Simulation (object):
         elif Spot == 2:
             self.Board [-1].append ("S")
         else:
-            return "*****Error: Adding to Board Received Unexpected Results*****"
+            print "*****Error: Adding to Board Received Unexpected Results*****"
 
 
     def Add_To_Virtual (self, Bin):
         pass
 
 
-    def Empty_Bin (self, Emptied_Bin):                                                  #Configured by location of emptied bin in list
+    def Consumed_Bin (self):
+        self.Time += 1
+        
+        for element in self.Bins_Consumed:
+            self.Empty_Bin (element)
+    
+    def Empty_Bin (self, Emptied_Bin):                                                  # Configured by location of emptied bin in list
         if self.Primary_Full(Emptied_Bin):
             self.Bins[Emptied_Bin][1] = "S"
             self.Bins[Emptied_Bin][2] = "E"
-            self.Add_To_Board (Emptied_Bin, 1)                                          #Need Lead Time Check
+            self.Add_To_Board (Emptied_Bin, 1)                                          # Need Lead Time Check
 
-        elif self.Primary_Is_Secondary (Emptied_Bin):                                   #need to put it on a vitual board
+        elif self.Primary_Is_Secondary (Emptied_Bin):
             self.Bins[Emptied_Bin][1] = "E"
-            self.Add_To_Board (Emptied_Bin, 2)                                          #Need Lead Time Check
+            self.Add_To_Board (Emptied_Bin, 2)                                          # Need Lead Time Check
             self.Stock_Out()
+            self.Replenishment()                                                        # Out of supplies triggers replenishment
 
         elif self.Secondary_Full(Emptied_Bin):
-            return "*****Error: Primary Emptied and Secondary Is Full*****"
+            print "*****Error: Primary Emptied and Secondary Is Full*****"
 
         elif self.Primary_Empty(Emptied_Bin) and self.Secondary_Empty(Emptied_Bin):
-            return "*****Error: Both Primary and Secondary Bin are Emptied.*****"
+            print "*****Error: Both Primary and Secondary Bin are Emptied.*****"
 
 
     def Extraction (self):
@@ -79,23 +90,26 @@ class Simulation (object):
                 elif self.Primary_Empty(location):
                     self.Bins[location][1] = "P"
                 else:
-                    return "*****Error: Expected Primary Bin", str(self.Bins[location][0]), "To Be Empty or Full (By Secondary)*****"
+                    print "*****Error: Expected Primary Bin", str(self.Bins[location][0]), "To Be Empty or Full (By Secondary)*****"
             elif element[1] == "S":
                 if self.Primary_Full (location) and self.Secondary_Empty(location):     # Primary Bin should be Replenished first
                     self.Bins[location][2] = "S"
 
                 else:
-                    return "*****Error: Secondary Bin Replenishment*****"               # Need to revist logic
+                    print "*****Error: Secondary Bin Replenishment Problem*****"       # Need to revist logic
             else:
-                return "*****Error: Received Invalid Input ('P', 'S', 'E')*****"
+                print "*****Error: Received Invalid Input ('P', 'S', 'E')*****"
 
+        self.Track_Board.append (len(self.Board))
         self.Board = []
+
+        print "-Successful Replenishemnt- \n"
         
 
     def Stock_Out (self):
         pass
 
-##Various Error Checking       
+## Various Error Checking Functions      
 
     def Check_Board (self):                                                             #Will check both error conditions
         pass
@@ -120,7 +134,21 @@ class Simulation (object):
     def Secondary_Empty (self, Bin_Location):                                           #Checks if Seconday Bin is Empty
         return self.Bins[Bin_Location][2] == "E"
 
+## Functions That Gather Relevant Information
+
+    def Avg_On_Board (self):
+        pass
 
 
-        
-    #Leadtime problem/triggering replenishments
+    def Avg_On_Virtual (self):
+        pass
+
+
+    def Avg_Num_Board (self):
+        print (sum (self.Track_Board) * 1.0) / (len (self.Track_Board))
+
+
+    def Avg_Num_Virtual (self):
+        print (sum (self.Track_Virtual) * 1.0) / (len (self.Track_Virtual))
+
+    

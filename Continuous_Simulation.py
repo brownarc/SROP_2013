@@ -1,40 +1,56 @@
 class Simulation (object):
     def __init__ (self, File_Name, Iteration_Amount):
-        self.Bins = []
-        self.Bins_Consumed = []
-        self.Board = []
-        self.Data = []
-        self.File_Name = File_Name
-        self.Inventory = []
-        self.Iteration_Amount = Iteration_Amount
-        self.Lead_Time = False
-        self.Need_Replenishment = False
-        self.Track_Board = []
-        self.Track_Virtual = []
-        self.Virtual_Board = []
-        self.Time = 0
+        self.Bins = []                                                                  # Gives all available bins along with P/S/E info
+        self.Bins_Consumed = []                                                         # Let's user know which bins have been consumed and need to be Emptied
+        self.Board = []                                                                 # Replenishment Board
+        self.Data = []                                                                  # Extracted Data from user inputted file
+        self.File_Name = File_Name                                                      # File to attract data from
+        self.Inventory = []                                                             # Inventory of all tracked data
+        self.Iteration_Amount = Iteration_Amount                                        # How many times to go through code
+        self.Lead_Time = 3                                                              # Needs to toggle True/False and give Lead Time ************
+        self.Need_Replenishment = False                                                 # Toggles True/False for needing replenishment
+        self.Track_Board = []                                                           # Used for stat tracking of Board
+        self.Track_Virtual = []                                                         # Used for stat tracking of Virtual Board
+        self.Virtual_Board = []                                                         # Replenishment Virtual Board
+        self.Time = 0                                                                   # Time for simulation
 
         self.Extraction()
 
 
-    def Add_To_Board (self, Bin, Spot):
+    def Add_To_Board (self, Bin, Spot):                                                 # Spot says whether it is P or S
         self.Board.append ([self.Bins[Bin][0]])
         if Spot == 1:
             self.Board [-1].append ("P")
         elif Spot == 2:
             self.Board [-1].append ("S")
         else:
-            print "*****Error: Adding to Board Received Unexpected Results*****"
+            print "*****Error: Adding to Board Received Unexpected Input*****"
 
 
-    def Add_To_Virtual (self, Bin):
-        pass
+    def Add_To_Virtual (self, Bin, Spot):
+        self.Virtual_Board.append ([self.Bins[Bin][0]])
+        if Spot == 1:
+            self.Virtual_Board [-1].append ("P")
+        elif Spot == 2:
+            self.Virtual_Board [-1].append ("S")
+        else:
+            print "*****Error: Adding To Virtual Board Received Unexpected Input*****"
 
 
     def Consumed_Bin (self):                                                            # With, Item spot = I_N and Time put on board = T_N with N integer
+        # Import Random for testing purposes
+        import random
         self.Time += 1                                                                  # Data will be of the form [[I_1,T_1], [I_2, T_2], ...]
                                                                                         # Function should have a while loop
+        #// Testing Purposes                                                                                    
+        x = random.randint (0,5)                                                        
+        
 
+        while random.randint (0, self.Iteration_Amount) < self.Iteration_Amount:
+            self.Bins_Consumed.append ([x, self.Time])
+
+        # Testing Purposes //
+        
         #Erlang Distribution Calculations
         
         for element in self.Bins_Consumed:
@@ -82,6 +98,8 @@ class Simulation (object):
             self.Bins.append ([element[0], "P", "S"])
         for element in self.Bins:
             self.Inventory.append (element[0])
+
+        self.Consumed_Bin()
     
 
     def Replenishment (self):                                                           # Need to run more tests in this area
@@ -121,7 +139,7 @@ class Simulation (object):
     def Check_Board (self):                                                             # Will check both error conditions
         pass
 
-        
+
     def Primary_Empty (self, Bin_Location):                                             # Checks for Nothing to be in Primary Bin (it is Empty)
         return self.Bins[Bin_Location][1] == "E"
 

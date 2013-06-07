@@ -1,9 +1,10 @@
 class Simulation (object):
-    def __init__ (self, File_Name, Iteration_Amount):
+    def __init__ (self, File_Name, Iteration_Amount, Demand):
         self.Bins = []                                                                  # Gives all available bins along with P/S/E info
         self.Bins_Consumed = []                                                         # Let's user know which bins have been consumed and need to be Emptied
         self.Board = []                                                                 # Replenishment Board
         self.Data = []                                                                  # Extracted Data from user inputted file
+        self.Demand = Demand                                                            # Allows user to input Demand
         self.File_Name = File_Name                                                      # File to attract data from
         self.Inventory = []                                                             # Inventory of all tracked data
         self.Iteration_Amount = Iteration_Amount                                        # How many times to go through code
@@ -38,20 +39,20 @@ class Simulation (object):
 
 
     def Consumed_Bin (self):                                                            # With, Item spot = I_N and Time put on board = T_N with N integer
-        # Import Random for testing purposes
-        import random
+        from scipy.stats import erlang
         self.Time += 1                                                                  # Data will be of the form [[I_1,T_1], [I_2, T_2], ...]
                                                                                         # Function should have a while loop
-        #// Testing Purposes                                                                                    
-        x = random.randint (0,5)                                                        
-        
+        Random_Variables = erlang.rvs (self.Demand, size = len (self.Bins))
 
-        while random.randint (0, self.Iteration_Amount) < self.Iteration_Amount:
-            self.Bins_Consumed.append ([x, self.Time])
-
-        # Testing Purposes //
+        count = 0
         
-        #Erlang Distribution Calculations
+        for element in Random_Variables:
+            if element > self.Demand:
+                print count
+                
+            
+            count += 1
+
         
         for element in self.Bins_Consumed:
             self.Empty_Bin (element[0])
@@ -79,9 +80,7 @@ class Simulation (object):
             print "*****Error: Both Primary and Secondary Bin are already empty.*****"
             
 
-    def Extraction (self):
-        import os
-        
+    def Extraction (self):        
         File = open (self.File_Name)
         File.readline()
         Raw_Data = File.readlines()
@@ -89,7 +88,7 @@ class Simulation (object):
 
         for element in Raw_Data:
             element = element.split()
-            self.Data.append ((element[0], element[1], element[2]))
+            self.Data.append ((element[0], element[1]))
 
         self.Initialize_Bins()
 

@@ -48,9 +48,8 @@ class Simulation (object):
         
         for element in Random_Variables:
             if element > self.Demand:
-                print count
+                self.Bins_Consumed.append ([count, self.Time])                          # Function empties the next one (want to empty 43, will empty 44)
                 
-            
             count += 1
 
         
